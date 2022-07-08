@@ -7,6 +7,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.work.*
 import com.hishd.workmanagerdemo.workers.UploadWorker
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
@@ -40,7 +41,7 @@ class MainActivity : AppCompatActivity() {
             .setConstraints(constraints)
             .build()
 
-        startRequest(uploadRequest)
+        startOneTimeRequest(uploadRequest)
     }
 
     private fun setOneTimeWorkRequestWithInputData() {
@@ -53,17 +54,24 @@ class MainActivity : AppCompatActivity() {
             .setInputData(data)
             .build()
 
-        startRequest(uploadRequest)
+        startOneTimeRequest(uploadRequest)
     }
 
     private fun setOneTimeWorkRequest() {
         val uploadRequest = OneTimeWorkRequest.Builder(UploadWorker::class.java)
             .build()
 
-        startRequest(uploadRequest)
+        startOneTimeRequest(uploadRequest)
     }
 
-    private fun startRequest(request: WorkRequest) {
+    //Start periodic request for repeating tasks
+    private fun setPeriodicWorkRequest(repeatInterval: Long, timeUnit: TimeUnit) {
+        val periodicWorkRequest = PeriodicWorkRequest.Builder(UploadWorker::class.java, repeatInterval, timeUnit).build()
+        startRequest(periodicWorkRequest)
+    }
+
+    //Starting the passed OneTimeWorkRequest
+    private fun startOneTimeRequest(request: OneTimeWorkRequest) {
         workManager.enqueue(request)
         workManager.getWorkInfoByIdLiveData(request.id).observe(this) {
             findViewById<TextView>(R.id.textView).text = it.state.name
@@ -74,6 +82,14 @@ class MainActivity : AppCompatActivity() {
                 val message = data.getString(UploadWorker.KEY_WORKER)
                 Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
             }
+        }
+    }
+
+    //Starting the passed WorkRequest
+    private fun startRequest(request: WorkRequest) {
+        workManager.enqueue(request)
+        workManager.getWorkInfoByIdLiveData(request.id).observe(this) {
+            findViewById<TextView>(R.id.textView).text = it.state.name
         }
     }
 
