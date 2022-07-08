@@ -76,4 +76,17 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    //Chaining work requests
+    private fun startMultipleRequests(request1: OneTimeWorkRequest, request2: OneTimeWorkRequest, request3: OneTimeWorkRequest) {
+        workManager
+            .beginWith(request1)
+            .then(request2)
+            .then(request3)
+            .enqueue()
+
+        workManager.getWorkInfoByIdLiveData(request1.id).observe(this) {
+            findViewById<TextView>(R.id.textView).text = it.state.name
+        }
+    }
 }

@@ -27,7 +27,7 @@ class UploadWorker(context: Context, params: WorkerParameters) : Worker(context,
             }
 
             for (i in 0 until 600)
-                Log.i("UploadWorker", "Uploading ${i}")
+                Log.i("UploadWorker", "Uploading $i")
 
             //Sending the current date to the caller or starter
             val dateFormat = SimpleDateFormat("dd/M/yyyy hh:mm:ss", Locale.ENGLISH)
